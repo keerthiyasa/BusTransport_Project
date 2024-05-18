@@ -1,0 +1,23 @@
+
+{
+    "scopes": [
+      {
+        "name": "$XSAPPNAME.BusTransportSystemAdmin",
+        "description": "BusTransportSystemAdmin"
+      }
+    ],
+    "attributes": [],
+    "role-templates": [
+      {
+        "name": "BusTransportSystemAdmin",
+        "description": "Role for Administration of BusTransportSystem",
+        "scope-references": [
+          "$XSAPPNAME.BusTransportSystemAdmin"
+        ]
+      }
+    ],
+    "oauth2-configuration": {
+      "redirect-uris": ["https://*.cfapps.us10-001.hana.ondemand.com//**"]
+   }
+    
+  }
