@@ -8,7 +8,7 @@ entity Bus: managed, cuid {
     bustype: String(40);
     @title: 'Busstops'
     busstops: String(40);
-    @title: 'Routes'
+    @title: 'Routes & Schedules'
     busroutes: String(40);
     @title: 'Timings'
     timings: Integer;

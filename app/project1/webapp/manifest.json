@@ -1,7 +1,7 @@
 {
   "_version": "1.59.0",
   "sap.app": {
-    "id": "com.transportsystem.bus.bus",
+    "id": "project1",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -12,8 +12,8 @@
     "resources": "resources.json",
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
-      "version": "1.12.2",
-      "toolsId": "d8c5931b-6ab6-436c-8341-b1723c6b2a4f"
+      "version": "1.14.2",
+      "toolsId": "e7bc0a37-04da-4b0a-835d-b6c6fee61559"
     },
     "dataSources": {
       "mainService": {
@@ -45,7 +45,7 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.124.0",
+      "minUI5Version": "1.127.1",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
@@ -61,14 +61,13 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.transportsystem.bus.bus.i18n.i18n"
+          "bundleName": "project1.i18n.i18n"
         }
       },
       "": {
         "dataSource": "mainService",
         "preload": true,
         "settings": {
-          "synchronizationMode": "None",
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
@@ -111,6 +110,22 @@
                     "route": "BusObjectPage"
                   }
                 }
+              },
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "uploadFile": {
+                      "press": ".extension.project1.ext.controller.Uploadfile.uploadExcel",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "upload"
+                    }
+                  }
+                }
               }
             }
           }
@@ -124,6 +139,15 @@
               "editableHeaderContent": false,
               "contextPath": "/Bus"
             }
+          }
+        }
+      }
+    },
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ListReport.ListReportController#project1::BusList": {
+            "controllerName": "project1.ext.controller.Uploadfile"
           }
         }
       }
