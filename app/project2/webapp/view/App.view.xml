@@ -1,0 +1,17 @@
+<mvc:View
+    controllerName="miyasuta.attachments.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <App id="app">
+        <pages>
+            <Page id="page" title="{i18n>title}">
+                <VBox>
+                    <!-- Load the fragment here -->
+                    <core:Fragment fragmentName="project2.custom.fragment.uploadDoc" type="XML" />
+                </VBox>
+            </Page>
+        </pages>
+    </App>
+</mvc:View>

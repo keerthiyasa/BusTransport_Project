@@ -1,165 +1,156 @@
-sap.ui.define(['sap/ui/core/mvc/ControllerExtension', 'sap/m/MessageToast'], function (ControllerExtension, MessageToast) {
+sap.ui.define([
+    'sap/ui/core/mvc/ControllerExtension', 
+    'sap/m/MessageToast',
+    'sap/ui/core/Fragment',
+    'sap/ui/model/odata/v4/ODataModel'
+], function (ControllerExtension, MessageToast, Fragment, ODataModel) {
     'use strict';
-
+ 
     var Constants = {
-        fragmentName: 'project1.ext.fragment.uploadFileDialog' // Replace with the actual path to your XML fragment
+        fragmentName: 'project1.ext.fragment.uploadFileDialog', // Replace with the actual path to your XML fragment
+        serviceNamespace: "com.transportsystem.bus"
     };
 
     return ControllerExtension.extend('project1.ext.controller.Uploadfile', {
         override: {
             onInit: function () {
-                var oModel = this.base.getExtensionAPI().getModel();
+                // Ensure dialog reference is correctly assigned
+                this.oDialog = this.byId("idFileDialog");
+                if (!this.oDialog) {
+                    console.warn("FileUpload dialog not found in onInit.");
+                }
+                
             }
         },
+        
+
+        
         uploadExcel: function (oEvent) {
-            this.base.getExtensionAPI().loadFragment({
+            var that = this;
+            Fragment.load({
                 name: Constants.fragmentName,
-                type: "XML",
                 controller: this
-            }).then(function (oDialogResult) {
-                oDialogResult.open();
+            }).then(function (oDialog) {
+                that.oDialog = oDialog;
+                that.getView().addDependent(that.oDialog);
+                that.oDialog.open();
             }).catch(function (error) {
                 MessageToast.show("Failed to load the fragment: " + error.message);
             });
         },
-		onFileChange: function (oEvent) {
-			// Read file
-			var file = oEvent.getParameter("files")[0];
-			if (file === undefined) {
-				return;
-			}
-			fileType = file.type;  //mimetype or file type
-			fileName = file.name;
-			//Instantiate JavaScript FileReader API
-			var fileReader = new FileReader();
-			//Read file content using JavaScript FileReader API
-			var readFile = function onReadFile(file) {
-				return new Promise(function (resolve) {
-					fileReader.onload = function (loadEvent) {
-						resolve(loadEvent.target.result.match(/,(.*)$/)[1]);
-					};
-					fileReader.readAsDataURL(file);
-				});
-			};
+        onCancelPress: function () {
+            var oDialog = this.oDialog || sap.ui.getCore().byId("idFileDialog");
 
-			new Action(readFile(file)).executeWithBusyIndicator().then(function (result) {
-				fileContent = result;
-			})
-		},
-		onUploadPress: function (oEvent) {
-			var oResourceBundle = this.base.getView().getModel("i18n").getResourceBundle();
-			//check file has been entered
-			if (fileContent === undefined || fileContent === "") {
-				MessageToast.show(oResourceBundle.getText("uploadFileErrMsg"));
-				return;
-			}
-
-			var oModel = this.base.getExtensionAPI().getModel();
-
-			var oOperation = oModel.bindContext("/VendorEmail" + Constants.serviceNamespace + "fileUpload(...)");
-
-			var fnSuccess = function () {
-				oModel.refresh();
-				MessageToast.show(oResourceBundle.getText("uploadFileSuccMsg"));
-				oDialog.close();
-				//Clear the file name from file uploader
-				sap.ui.getCore().byId("idFileUpload").clear();
-				oDialog.destroy();
-				fileContent = undefined;
-			}.bind(this);
-
-			var fnError = function (oError) {
-				this.base.editFlow.securedExecution(
-					function () {
-						Messaging.addMessages(
-							new sap.ui.core.message.Message({
-								message: oError.message,
-								target: "",
-								persistent: true,
-								type: sap.ui.core.MessageType.Error,
-								code: oError.error.code
-							})
-						);
-						var aErrorDetail = oError.error.details;
-						aErrorDetail.forEach((error) => {
-							Messaging.addMessages(
-								new sap.ui.core.message.Message({
-									message: error.message,
-									target: "",
-									persistent: true,
-									type: sap.ui.core.MessageType.Error,
-									code: error.code
-								})
-							);
-						})
-					}
-				);
-				oDialog.close();
-				//Clear the file name from file uploader
-				sap.ui.getCore().byId("idFileUpload").clear();
-				oDialog.destroy();
-				fileContent = undefined;
-			}.bind(this);
-
-			oOperation.setParameter("mimeType", fileType);
-			oOperation.setParameter("fileName", fileName);
-			oOperation.setParameter("fileContent", fileContent);
-			oOperation.setParameter("process", sProcess);
-			oOperation.execute().then(fnSuccess, fnError);
-		},
-		onTempDownload: function (oEvent) {
-			var oModel = this.base.getExtensionAPI().getModel(),
-				oResourceBundle = this.base.getView().getModel("i18n").getResourceBundle();
-
-			var oModel = this.base.getExtensionAPI().getModel(),
-				oResourceBundle = this.base.getView().getModel("i18n").getResourceBundle();
-
-			var oOperation = oModel.bindContext("/VendorEmail" + Constants.serviceNamespace + "downloadFile(...)");
-
-			//Success function to display success messages from OData Operation
-			var fnSuccess = function () {
-				var oResults = oOperation.getBoundContext().getObject();
-
-				var aUint8Array = Uint8Array.from(atob(oResults.fileContent), c => c.charCodeAt(0)),
-					oblob = new Blob([aUint8Array], { type: oResults.mimeType });
-
-				File.save(oblob, oResults.fileName, oResults.fileExtension, oResults.mimeType);
-				MessageToast.show(oResourceBundle.getText("downloadTempSuccMsg"));
-			}.bind(this);
-
-			//Error function to display error messages from OData Operation
-			var fnError = function () {
-				this.base.editFlow.securedExecution(
-					function () {
-						Messaging.addMessages(
-							new sap.ui.core.message.Message({
-								message: oError.message,
-								target: "",
-								persistent: true,
-								type: sap.ui.core.MessageType.Error,
-								code: oError.error.code
-							})
-						);
-						var aErrorDetail = oError.error.details;
-						aErrorDetail.forEach((error) => {
-							Messaging.addMessages(
-								new sap.ui.core.message.Message({
-									message: error.message,
-									target: "",
-									persistent: true,
-									type: sap.ui.core.MessageType.Error,
-									code: error.code
-								})
-							);
-						})
-					}
-				);
-			}.bind(this);
-
-			// Execute OData V4 operation i.e a static function 'downloadFile' to download the excel template
-			oOperation.execute().then(fnSuccess, fnError)
-                        // From UI5 version 1.123.0 onwards use invoke function
-			//oOperation.invoke().then(fnSuccess, fnError);
-		}
+            if (oDialog) {
+                oDialog.close();
+            } else {
+                console.error("Dialog not found.");
+            }
+        },
+        onFileChange: function (oEvent) {
+            var file = oEvent.getParameter("files")[0];
+            if (!file) {
+                return;
+            }
+        
+            this.fileType = file.type;  
+            this.fileName = file.name;  
+            this.fileExtension = file.name.split('.').pop();
+        
+            var fileReader = new FileReader();
+            
+            fileReader.onload = function (loadEvent) {
+                this.fileContent = loadEvent.target.result.split(",")[1];
+            }.bind(this);  
+        
+            fileReader.readAsDataURL(file);
+        },
+        onUploadPress: function (oEvent) {
+            var that = this;
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+        
+            // Check if file content is available
+            if (!this.fileContent || this.fileContent === "") {
+                MessageToast.show(oResourceBundle.getText("uploadFileErrMsg"));
+                return;
+            }
+        
+            // Prepare the data for the upload
+            var data = JSON.stringify({
+                mimeType: this.fileType,
+                fileName: this.fileName,
+                fileContent: this.fileContent,
+                fileExtension: this.fileExtension
+            });
+        
+            // Perform the AJAX request to upload the file
+            $.ajax({
+                url: "/odata/v4/Transport/fileUpload",
+                type: "POST",
+                contentType: "application/json",
+                data: data,
+                dataType: "json",
+                success: function (response) {
+                    // Show success message
+                    MessageToast.show(oResourceBundle.getText("fileUploadSuccessMsg"));
+        
+                    // Clear the file uploader and file content
+                    sap.ui.getCore().byId("idFileUpload").clear();
+                    that.fileContent = undefined;
+        
+                    // Close the FileUpload dialog if it's open
+                    if (that.oDialog) {
+                        that.oDialog.close();
+                    } else {
+                        console.warn("FileUpload dialog reference not found.");
+                    }
+                    
+                    
+                    // Refresh the List Report
+                    that._refreshListReport();
+                },
+                error: function (xhr, status, error) {
+                    // Show error message
+                    var errorMessage = oResourceBundle.getText("fileUploadErrorMsg");
+                    MessageToast.show(errorMessage);
+        
+                    console.error("Upload failed:", error);
+                },
+            });
+        },
+        
+        _refreshListReport: function () {
+            var oExtensionAPI = this.getView().getController().getExtensionAPI();  // Get the extension API
+            if (oExtensionAPI && oExtensionAPI.refresh) {
+                oExtensionAPI.refresh();  // Refresh the List Report's binding
+            } else {
+                console.error("Extension API not available for refreshing List Report.");
+            }
+        },
+        
+        onTempDownload: function (oEvent) {
+            var wb = XLSX.utils.book_new();
+            var wsData = [
+                ["id", "busno", "bustype", "busstops", "busroutes", "timings","buscap","busop"] 
+            ];
+            var ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            var wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+            var blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "bus_template.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     });
 });

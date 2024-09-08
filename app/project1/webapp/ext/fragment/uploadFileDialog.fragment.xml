@@ -16,10 +16,11 @@
 		<footer>
 			<Toolbar id="idFooterToolbar">
 				<content>
-					<Button id="idDownloadTempButton" text="{i18n>downloadTempButtonTxt}" press="onTempDownload" icon= "sap-icon://download-from-cloud" />
-					<Button id="idUploadButton" text="{i18n>uploadButtonTxt}" type="Emphasized" press="onUploadPress" icon="sap-icon://upload-to-cloud" />
-					<Button id="idCancelButton" text="{i18n>cancelButtonTxt}" press="onCancelPress" icon="sap-icon://cancel"/>
+					<Button id="idDownloadTempButton" text="{i18n>downloadTemplate}" press="onTempDownload" icon= "sap-icon://download-from-cloud" />
+					<Button id="idUploadButton" text="{i18n>upload}" type="Emphasized" press="onUploadPress" icon="sap-icon://upload-to-cloud" />
+					<Button id="idCancelButton" text="{i18n>cancel}" press="onCancelPress" icon="sap-icon://cancel"/>
 				</content>
+
 			</Toolbar>
 		</footer>
 	</Dialog>

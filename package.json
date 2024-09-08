@@ -25,7 +25,8 @@
     "start": "cds-serve",
     "watch-bus": "cds watch --open bus/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-project1": "cds watch --open project1/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-project2": "cds watch --open project2/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-project2": "cds watch --open project2/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-hackathonproject": "cds watch --open hackathonproject/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {
@@ -52,6 +53,10 @@
     "app/project1",
     "app/project1",
     "app/project1",
-    "app/project1"
+    "app/project1",
+    "app/hackathonproject",
+    "app/project2",
+    "app/project2",
+    "app/project2"
   ]
 }
